@@ -1,1 +1,1472 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 4.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 
+
+
+
+
+
+
+
+
+
+<link href="http://www.chinalawedu.com/falvzixun/css/global.css" rel="stylesheet" type="text/css" />
+<script src="http://www.chinalawedu.com/falvzixun/js/global2.js" language="javascript"></script>
+<script src="http://www.chinalawedu.com/falvzixun/theme/js/jquery-1.6.js" language="javascript"></script>
+<link href="http://www.chinalawedu.com/falvzixun/css/pagination_style.css" rel="stylesheet" type="text/css" />
+
+
+
+<script type="text/javascript">
+function genPageTagByNoData(returnNum) {
+    var str = "<a href='#' target='_self' style='cursor:pointer' class='syy'><span>上一页</span></a> <a href='#' target='_self' style='cursor:pointer'>1</a> <a href='#' target='_self' style='cursor:pointer'>2</a>  ";
+    	str = str+"<a href='#' target='_self' style='cursor:pointer' class='xyy'><span>下一页</span></a> <span> 共0页 到第<input type='text' class='inputa'>页　<input type='button' class='qd' disabled='disabled'></span>" 
+    return str;
+}
+
+function genPageTag(totalNum, pageNo, returnNum) {
+	var totalNum = parseInt(totalNum);
+	var pageNo = parseInt(pageNo);
+	var returnNum = parseInt(returnNum);
+	var totalPage = Math.floor((totalNum + returnNum - 1) / returnNum);
+	
+    var str = "";
+    if (pageNo > 1) {
+        str = str + "<a href='#' style='cursor:pointer' class='syy' onclick=\"searchData('" + (pageNo - 1) + "','');return false;\">上一页</a>";
+    } 
+    
+    if(totalPage > 5){
+    	if(pageNo > 3){
+			if(pageNo >= (totalPage-2)){
+				str = str + "<a>…</a>";
+				for(var i=totalPage-4; i<=totalPage; i++){
+		    		if(i != pageNo){
+		    			str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('" + i + "','');return false;\">"+i+"</a>";
+		    		}else{
+		    			str = str + " <a href='#' style='cursor:pointer' class='on' onclick=\"searchData('" + i + "','');return false;\">"+i+"</a>";
+		    		}
+				}
+			}else{
+    			str = str + "<a>…</a>";
+				str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('"+(pageNo-2)+"','');return false;\">"+(pageNo-2)+"</a>";
+				str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('"+(pageNo-1)+"','');return false;\">"+(pageNo-1)+"</a>";
+				str = str + " <a href='#' style='cursor:pointer' class='on' onclick=\"searchData('"+(pageNo)+"','');return false;\">"+(pageNo)+"</a>";
+				str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('"+(pageNo+1)+"','');return false;\">"+(pageNo+1)+"</a>";
+				str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('"+(pageNo+2)+"','');return false;\">"+(pageNo+2)+"</a>";
+				str = str + "<a>…</a>";
+			}
+    	}else{
+    		for(var i=1; i<=5; i++){
+	    		if(i != pageNo){
+	    			str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('" + i + "','');return false;\">"+i+"</a>";
+	    		}else{
+	    			str = str + " <a href='#' style='cursor:pointer' class='on' onclick=\"searchData('" + i + "','');return false;\">"+i+"</a>";
+	    		}
+    		}
+    		str = str + "<a>…</a>";
+    	}
+    }else{
+    	for(var i=1; i<=totalPage; i++){
+    		if(i != pageNo){
+    			str = str + " <a href='#' style='cursor:pointer' onclick=\"searchData('" + i + "','');return false;\">"+i+"</a>";
+    		}else{
+    			str = str + " <a href='#' style='cursor:pointer' class='on' onclick=\"searchData('" + i + "','');return false;\">"+i+"</a>";
+    		}
+    	}
+    }
+    
+    if (pageNo < totalPage) {
+        str = str + " <a href='#' style='cursor:pointer' class='xyy' onclick=\"searchData('" + (pageNo + 1) + "','');return false;\">下一页</a>";
+    }
+    str = str + "&nbsp;&nbsp;共" + totalPage + "页";
+    if (totalPage > 1) {
+    	str = str + "　到第<input type='text' class='inputa' id='gotoPage'>页 <input type='button' class='qd' onclick='gotoPage("+totalPage+");' value=''></span>";
+    }else{
+    	str = str + "　到第<input type='text' class='inputa' id='gotoPage'>页 <input type='button' class='qd' onclick='gotoPage("+totalPage+");' value=''></span>";
+    }
+    return str;
+}
+function gotoPage(totalPage) {
+	var page = $("#gotoPage").val();
+	if(/^[0-9]+$/.test(page) && page <= totalPage){
+		searchData(page,'');
+	}else{
+		alert("页码输入错误!");
+	}
+}
+function getArea(parentid,reAreaid,select){
+
+	if(parentid != ''){
+		$("#"+select).empty();
+	    $.getJSON("/falvzixun/area/view.do;jsessionid=08B33440DA8EFA0551BA25944F17086D?op=getAreaList",
+	        {parentid: parentid, ranNum: Math.random()},
+	        function(data){
+	            if (data[0] != "fail") {
+	            	var str = "<option value=''>--请选择--</option>";
+	            	var areaid = "";
+	            	var areaName = "";
+	                for(var k=0; k<data[0].length; k++){
+	                	areaid = data[0][k].areaid;
+	                	areaName = data[0][k].areaName;
+	                	if(areaid == reAreaid){
+	                		str += "<option value=" + areaid + " selected>" + areaName + "</option>";
+	                	}else{
+	                		str += "<option value=" + areaid + ">" + areaName + "</option>";
+	                	}
+	                }
+	                $("#"+select).html(str);
+	            } else {
+					$("#"+select).html("<option value=''>--请选择--</option>");
+	            }
+	    	});
+	}else{
+		$("#"+select).html("<option value=''>--请选择--</option>");
+	}
+}
+
+function getSpecialty(parentID,child,value){
+	if(parentID != ''){
+		$("#"+child).empty();
+	    $.getJSON("/falvzixun/specialtyCount/view.do;jsessionid=08B33440DA8EFA0551BA25944F17086D?op=getSpecialtyList",
+	        {parentSpecialty: parentID, ranNum: Math.random()},
+	        function(data){
+	            if (data[0] != "fail"){
+	            	var str = "<option value=''>--请选择--</option>";
+	            	var specialty = "";
+	            	var name = "";
+	                for(var k=0; k<data[0].length; k++){
+	                	specialty = data[0][k].specialty;
+	                	name = data[0][k].name;
+	                	if(specialty == value){
+	                		str += "<option value=" + specialty + " selected>" + name + "</option>";
+	                	}else{
+	                		str += "<option value=" + specialty + ">" + name + "</option>";
+	                	}
+	                }
+	                $("#"+child).html(str);
+	            } else {
+					$("#"+child).html("<option value=''>--请选择--</option>");
+	            }
+	    });
+	}else{
+		$("#"+child).html("<option value=''>--请选择--</option>");
+	}
+}
+
+function checkValid(Obj,msgObj,maxLength){
+	var obj = eval(Obj);
+	if(obj.value.length < maxLength){
+		var str = "您还可以输入" + (maxLength-obj.value.length).toString() + "字节";
+		$("#"+msgObj).html(str);
+	}else{
+		obj.value = obj.value.substring(0,maxLength);
+		$("#"+msgObj).html("您输入的总字数已达到最大限制！");
+	}
+}
+
+function textlimit(Obj, maxLength){
+	var obj = eval(Obj);
+	if (obj.value.length >= maxLength) 
+		obj.value = obj.value.substring(0,maxLength-1);        
+}
+
+function addNotice(objID, objType){  
+    $.post("/falvzixun/hyPublic/operate.do;jsessionid=08B33440DA8EFA0551BA25944F17086D",
+        {op:"addNoitce", noticeID: objID, noticeType: objType, ranNum:Math.random()},
+        function(data) {
+            var result = eval('('+data+')'); 
+            if (result.msg == 'ok') {    
+                alert("关注成功！");
+             }
+             else if(result.msg == 'alread'){
+             	alert("已经添加过关注！");
+             }
+             else if(result.msg == 'null'){
+             	alert("您还没有登录，请先登录！");
+             	openLoginDiv(objID,objType);
+             	return;
+             } 
+             else if(result.msg == 'lawyer'){
+             	alert("您还没有完善信息，请先完善！");
+             	window.open("/falvzixun/lvshiRegist/;jsessionid=08B33440DA8EFA0551BA25944F17086D");
+             } 
+             else if(result.msg == 'office'){
+             	alert("您还没有完善信息，请先完善！");
+             	window.open("/falvzixun/lvsuoRegist/;jsessionid=08B33440DA8EFA0551BA25944F17086D");
+             } 
+             else if(result.msg == 'org'){
+             	alert("您还没有完善信息，请先完善！");
+             	window.open("/falvzixun/orgRegist/;jsessionid=08B33440DA8EFA0551BA25944F17086D");
+             } 
+             else if(result.msg == 'notStatus'){
+             	alert("您的信息正在审核中，请等待！");
+             } 
+             else {
+                alert("关注失败！");
+             }
+    });
+}
+
+function genStrDate(data){
+	if(data == null){
+		return "";
+	}else{
+		var c = new Date(); 
+		c.setTime(data.time);
+		var mon = c.getMonth()+1;
+		if(mon<10){
+			mon = "0" + mon;
+		}
+		var dat = c.getDate();
+		if(dat<10){
+			dat = "0" + dat;
+		}
+		return c.getYear()+"-"+mon+"-"+dat;
+	}
+}
+
+function genStrDateAll(data){
+	if(data == null){
+		return "";
+	}else{
+		var c = new Date(); 
+		c.setTime(data.time);
+		var mon = c.getMonth()+1;
+		if(mon<10){
+			mon = "0" + mon;
+		}
+		var dat = c.getDate();
+		if(dat<10){
+			dat = "0" + dat;
+		}
+		return c.getFullYear()+"-"+mon+"-"+dat;
+	}
+}
+function getFormatDate(data) { 
+   if(navigator.userAgent.indexOf("MSIE")>0) { 
+	  return genStrDate(data);
+   } 
+   if(isFirefox=navigator.userAgent.indexOf("Firefox")>0){ 
+	   return genStrDateAll(data); 
+   } 
+   if(isSafari=navigator.userAgent.indexOf("Safari")>0) { 
+	   return genStrDate(data); 
+   }  
+   if(isCamino=navigator.userAgent.indexOf("Camino")>0){ 
+	   return genStrDate(data); 
+   } 
+   if(isMozilla=navigator.userAgent.indexOf("Gecko/")>0){ 
+	   return genStrDate(data); 
+   } 
+   
+}
+function genStrDateTime(data){
+	if(data == null){
+		return "";
+	}else{
+		var c = new Date(); 
+		c.setTime(data.time);
+		var mon = c.getMonth()+1;
+		if(mon<10){
+			mon = "0" + mon;
+		}
+		var dat = c.getDate();
+		if(dat<10){
+			dat = "0" + dat;
+		}
+		return c.getFullYear()+"-"+mon+"-"+dat+" "+c.getHours()+":"+c.getMinutes()+":"+c.getSeconds();
+	}
+}
+
+
+function genStrDateTimeAll(data){
+	if(data == null){
+		return "";
+	}else{
+		var c = new Date(); 
+		c.setTime(data.time);
+		var mon = c.getMonth()+1;
+		if(mon<10){
+			mon = "0" + mon;
+		}
+		var dat = c.getDate();
+		if(dat<10){
+			dat = "0" + dat;
+		}
+		return c.getFullYear()+"-"+mon+"-"+dat+" "+c.getHours()+":"+c.getMinutes()+":"+c.getSeconds();
+	}
+}
+
+
+function genStrDateTimeYear(data){
+	if(data == null){
+		return "";
+	}else{
+		var c = new Date(); 
+		c.setTime(data.time);
+		var mon = c.getMonth()+1;
+		if(mon<10){
+			mon = "0" + mon;
+		}
+		var dat = c.getDate();
+		if(dat<10){
+			dat = "0" + dat;
+		}
+		return c.getFullYear();
+	}
+}
+
+function getTime(data){
+	if(data == null){
+		return "";
+	}else{
+		var c = new Date(); 
+		c.setTime(data.time);
+		var mon = c.getMonth()+1;
+		if(mon<10){
+			mon = "0" + mon;
+		}
+		var dat = c.getDate();
+		if(dat<10){
+			dat = "0" + dat;
+		}
+		var hou = c.getHours();
+		if(hou<10){
+			hou = "0" + hou;
+		}
+	    var min = c.getMinutes();
+		if(min<10){
+			min = "0" + min;
+		}
+	    var sec = c.getSeconds();
+		if(sec<10){
+			sec = "0" + sec;
+		}
+		return c.getFullYear()+"-"+mon+"-"+dat+" "+hou+":"+min+":"+sec;
+	}
+}
+
+function genDateSpace(data){  
+
+	if(data == null){
+		return "－";
+	}else{
+		var c = new Date();
+		c.setTime(data.time);
+		var cn = new Date();
+		if(cn<c){
+			return 0;
+		}else{
+			return Math.floor((cn-c)/(24*60*60*1000));
+		}
+	}
+}
+
+function regValid(o,regStr,mo,m){
+	if ( !( regStr.test( o.val() ) ) ) {
+		o.addClass('ui-state-error');
+		updateAddTips(mo,m);
+		return false;
+	} else {
+		o.removeClass('ui-state-error');
+		updateAddTips(mo,"");
+		return true;
+	}
+}
+
+function regValidate(o,regStr,mo,m){
+	if ( ( regStr.test( o.val() ) ) ) {
+		o.addClass('ui-state-error');
+		updateAddTips(mo,m);
+		return false;
+	} else {
+		o.removeClass('ui-state-error');
+		updateAddTips(mo,"");
+		return true;
+	}
+}
+
+function validatePwd(pwd,secondPwd,mo,m){
+	if(pwd.val() == secondPwd.val()){
+		updateAddTips(mo,"");
+		return true;
+	}else{
+		updateAddTips(mo,m);
+		return false;
+	}
+}
+
+function selfValid(o,boo,mo,m){
+	if ( !boo ) {
+		o.addClass('ui-state-error');
+		updateAddTips(mo,m);
+		return false;
+	} else {
+		o.removeClass('ui-state-error');
+		updateAddTips(mo,"");
+		return true;
+	}
+}
+
+function updateAddTips(mo,t) {
+	mo.text(t).effect("highlight",{},1500);
+}
+
+function mouseCoords(ev){
+   if(ev.pageX || ev.pageY){
+       return {x:ev.pageX, y:ev.pageY};     
+   }     
+   return { x:ev.clientX + document.body.scrollLeft - document.body.clientLeft, y:ev.clientY + document.body.scrollTop  - document.body.clientTop }; 
+}
+
+String.prototype.trim = function(){   
+    return this.replace(/(^\s*)|(\s*$)/g, "");   
+}  
+
+function closeWin(){
+	window.opener = null;
+	window.open("","_self");
+	window.close();
+}
+function pageinit() {	
+	msg = '';
+	error = '';
+	isClose = '';
+	if (error) {
+		ShowMsgo.show('错误提示', '<font color=red>'+error+'</font>', 2);
+		error = '';
+		document.getElementById("messageDivButton").focus();
+	} else if(msg) {
+		ShowMsgo.show('系统提示', '<font color=green>'+msg+'</font>', 2);
+		msg = '';
+		document.getElementById("messageDivButton").focus();
+	}
+	if(isClose=='y'){	
+		setTimeout(function(){
+			window.open('','_self');
+			window.close();
+		},1000);
+		isClose='';
+	}
+}
+function validateResultByForm(myform,aErrorMsg){
+	
+ var myform = document.forms[myform];
+ var validateResult = true;
+ if (myform){
+	 var errorMsg = "";
+	 var i;
+	 var formElement;
+	 
+	 for (i=0;i<myform.elements.length;i++){
+	 
+		  formElement = myform.elements[i];	  
+		  if (formElement.getAttribute("warnName") == null || formElement.getAttribute("warnName") + "" == "undefined"){
+		  	continue;
+		  }
+		  
+	  	validateResult = validateElementById(formElement.id,aErrorMsg);
+	  	if (!validateResult){
+	  		break;
+	  	}
+	 }
+ }
+ return validateResult;
+ 
+}
+
+function validateElementById(input,aErrorMsg){
+	var inputobj = document.getElementById(input);
+	var warnStr = validateResultOfInput(inputobj);
+	if (warnStr != ""){
+		$("#"+input).addClass('ui-state-error');
+		$("#"+aErrorMsg).text(warnStr).effect("highlight",{},1500);
+		return false;
+	}else{
+		//$("#"+input).removeClass('ui-state-error');
+		$("#"+aErrorMsg).text("");
+		return true;
+	}
+}
+
+function validateResultOfInput(input){
+	var value = input.value;
+ 	var warnName = input.getAttribute("warnName");
+ 
+	 if (warnName){
+	 	warnName = "'" + warnName + "' ";
+	 }else{
+	 	warnName = "";
+	 }
+ 
+ var errorMsg = "";
+ 
+ if(input.getAttribute("isNotNull")){
+  if (input.getAttribute("isNotNull")=="true" && _isBlank(value)){
+   errorMsg = warnName + "不能为空!";
+   return  errorMsg;
+  }
+ }
+ 
+ if(input.getAttribute("maxsize")){
+  if(_getByteLength(value)>parseInt(input.getAttribute("maxsize"))){
+   errorMsg = warnName + "最大长度" + input.getAttribute("maxsize") + "个字节，一个汉字占2个字节。";
+   return  errorMsg;
+  }
+ }
+ 
+ if(input.getAttribute("datatype") ){
+  switch(input.getAttribute("datatype")){
+   case "number":
+    if (_isNumber(value)==false){
+    
+     errorMsg = warnName + "值必须为数字!";
+     return  errorMsg;
+    }else{
+    
+     var maxValue = 1*(input.getAttribute("maxValue"));
+     var theValue = 1*value;
+     if(theValue > maxValue){
+      errorMsg = warnName + "值必须 < " + maxValue + "!";
+      return  errorMsg;
+     }
+     var minValue = 1*(input.getAttribute("minValue"));
+     if(theValue < minValue){
+      errorMsg = warnName + "值必须 > " + minValue + "!";
+      return  errorMsg;
+     }
+    }
+    break;
+	case "text":
+	
+    	if (false){
+     		errorMsg = warnName + " 输入不合法!";
+     		return  errorMsg;
+    	}
+   		break;
+   	case "email":
+   		var t = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+   		if((input.getAttribute("isNotNull")=="true") || "" != value){
+	   		if(!t.test(value)){
+	   			errorMsg = warnName + " 输入不合法!";
+	   			return  errorMsg;
+	   		}
+	   	}
+   		break;
+   	case "http":
+   		 var strRegex = "^((https|http|ftp|rtsp|mms)?://)"
+        + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@
+        + "(([0-9]{1,3}\.){3}[0-9]{1,3}" 
+        + "|" 
+        + "([0-9a-z_!~*'()-]+\.)*" 
+        + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." 
+        + "[a-z]{2,6})" 
+        + "(:[0-9]{1,4})?" 
+        + "((/?)|" 
+        + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+        var re=new RegExp(strRegex);
+		if(input.getAttribute("isNotNull")=="true" || "" != value){
+	   		if(!re.test(value)){
+	   			errorMsg = warnName + " 输入不合法!";
+	   			return  errorMsg;
+	   		}
+	   	}
+   		break;
+   default  : break; 
+  }
+ }
+ return errorMsg;
+}
+
+function _getByteLength(str){
+ var i;
+ var len;
+ len = 0;
+ for(i=0;i<str.length;i++){
+  if(str.charCodeAt(i)>255){
+   len+=2;
+  }else{
+   len++;
+  }
+ }
+ return len;
+}
+
+function _isBlank(value){
+ var str = value.trim();
+ return str.length == 0;
+}
+
+function _isNumber(value){
+    if(isNaN(value)==0)
+        return true;
+ else
+  return false;
+}
+
+ function getCityArea(provinceID,reAreaid,select){
+	var parentid = $("#"+provinceID).val();
+	if(parentid != ""){
+		$("#"+select).empty();
+	    $.getJSON("/falvzixun/area/view.do;jsessionid=08B33440DA8EFA0551BA25944F17086D?op=getAreaList",
+	        {parentid: parentid, ranNum: Math.random()},
+	        function(data){
+	            if (data[0] != "fail") {
+	            	var str = "<option value=''>---请选择---</option>";
+	            	var areaid = "";
+	            	var areaName = "";
+	                for(var k=0; k<data[0].length; k++){
+	                	areaid = data[0][k].areaid;
+	                	areaName = data[0][k].areaName;
+	                	if(areaid == reAreaid){
+	                		str += "<option value=" + areaid + " selected>" + areaName + "</option>";
+	                	}else{
+	                		str += "<option value=" + areaid + ">" + areaName + "</option>";
+	                	}
+	                }
+	                $("#"+select).html(str);
+	            } else {
+					$("#"+select).html("<option value=''>---请选择---</option>");
+	            }
+	    	});
+	}else{
+		$("#"+select).html("<option value=''>---请选择---</option>");
+	}
+}
+
+function noAudit(){
+	alert("你的信息正在审核中，暂时无法使用此功能");
+}
+</script>
+<link href="http://www.chinalawedu.com/falvzixun/css/lvshigeren/lshigr-01.css" rel="stylesheet" type="text/css" />
+<script src="http://www.chinalawedu.com/falvzixun/theme/js/cdeleditor/xheditor-1.1.12-zh-cn.min.js" language="javascript"></script>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>马云秀律师个人网站主页</title>
+</head>
+<script src="http://www.chinalawedu.com/falvzixun/js/head_champion_new.js" language="javascript"></script>
+<body>
+
+
+
+<div class="container">
+	
+    <div class="banner">
+    	<a href="http://www.chinalawedu.com/falvzixun/" target="_blank" title="法律教育网" ><div class="left"></div></a>
+        <div class="right">欢迎光临<b>马云秀</b>律师个人网站主页</div>
+        <div class="lss"></div>
+  	</div>
+    
+    
+    
+
+
+<style>
+/* 二级导航_律所个人页 */
+.lsnav{ overflow:hidden; width:950px; height:25px; padding:8px 0;}
+.lsnav ul{}
+.lsnav li{ width:92px; height:25px; margin-right:15px; float:left; line-height:25px; text-align:center; font-size:14px; font-weight:700; background:url(http://www.chinalawedu.com/falvzixun/images/lvshigeren/lvgr_06.jpg) no-repeat; cursor:pointer;}
+.lsnav a li{ color:#c53d3d;}
+.lsnav li:hover{background:url(http://www.chinalawedu.com/falvzixun/images/lvshigeren/lvgr_08.jpg) no-repeat; cursor:pointer;}
+.lsnav a li:hover{ color:#fff;}
+.center-01 {
+    background: url("/falvzixun/images/index/index_194.jpg") no-repeat scroll 0 0 transparent;
+    color: #B60001;
+    display: inline;
+    float: left;
+    height: 17px;
+    padding-top: 4px;
+    text-align: center;
+    width: 105px;
+}
+</style>
+
+
+<div class="lsnav" style="padding: 2px;height: 1px;"></div>
+<div class="lsnav" style="border: 1px solid #FFBEBE;padding-bottom: 2px;padding-top: 2px;display: none;" id="unloginDiv">
+			<div style="width: 200px; float: left;padding-left: 20px;padding-top: 2px;">
+				会员代码：<input  id='usernameLogin' type='text' style="border: 1px solid #DEDEDE;height: 18px;line-height: 18px;width: 130px;"/>
+			</div>
+	       	<div style="width: 200px;float: left;padding-top: 2px;">
+	       		密　　码：<input  id='passwdLogin' type='password' style="border: 1px solid #DEDEDE;height: 18px;line-height: 18px;width: 130px;"/>
+	       	</div>
+			<div style="width: 200px;float: left;padding-top: 2px;">
+				会员类别：
+	       		<select  id='logintypeLogin' style='width:110px;'>
+	           		<option value='public'>公众会员</option>
+	           		<option value='lawyer' selected="selected">律师会员</option>
+	           		<option value='office'>律所会员</option>
+	           		<option value='org'>法律援助机构</option>
+	           	</select>
+           	</div>
+           	<div style="width: 250px;float: left;padding-top: 2px;">
+	       		验 证 码：<input  id='randcodeLogLogin' type='text'  style="border: 1px solid #DEDEDE;height: 18px;line-height: 18px;width: 100px;"/>
+	       		<img src='http://portal.cdeledu.com/auth/randcode.php?id=login' id='randcodeLogImgLogin'/>
+	       		<a style='color: #000000;' href='#' onclick='chgverifyLogLogin();'>刷新</a>
+       		</div>
+       		<div style="width: 50px;float: left;padding-top: 2px;">
+       			<input  type='button' class='a-test8' onclick='checkdataLogin()'  value='登录'/>
+       		</div>
+</div>
+<div class="lsnav" style="border: 1px solid #FFBEBE;padding-bottom: 2px;padding-top: 2px;display: none;" id="loginSuccessDiv">
+			<div style="width: 250px; float: left;padding-left: 100px;padding-top: 8px;height: 16px">
+				欢迎您：
+					
+			</div>
+	       	<div style="width: 250px;float: left;padding-top: 8px;height: 16px;">
+	       		会员类别：
+		       		
+	           		
+					
+					
+	       	</div>
+			<div style="width: 250px;float: left;padding-top: 2px;height: 17px;">
+				
+	        	
+					
+					
+						
+						
+						
+					
+				
+           	</div>
+       		<div style="width: 100px;float: left;padding-top: 2px;height: 17px;text-align: center;">
+       			<input  type='button' class='a-test8' onclick='logout()'  value='退出'/>
+       		</div>
+</div>
+       		<input id="memberLogin" type="hidden" value="">
+       		<input id="logintypeLogin" type="hidden" value="">
+<div class="lsnav">
+    <ul>
+        <a href="http://cbmyx.chinalawedu.com/" title="马云秀律师个人主页"><li>个人主页</li></a>
+        <a href="http://www.chinalawedu.com/lvshi/cbmyx/2.shtm" title="马云秀律师简介"><li>律师简介</li></a>
+        <a href="http://www.chinalawedu.com/lvshi/cbmyx/3.shtm" title="马云秀律师业务范围"><li>业务范围</li></a>
+        <a href="http://www.chinalawedu.com/lvshi/cbmyx/zixun/" title="马云秀律师一对一咨询"><li>一对一咨询</li></a>
+        <a href="http://www.chinalawedu.com/lvshi/cbmyx/anli/" title="马云秀律师成功案例"><li>成功案例</li></a>
+        <a href="http://www.chinalawedu.com/lvshi/cbmyx/6.shtm" title="马云秀律师留言板"><li>留言板</li></a>
+        <a href="http://www.chinalawedu.com/lvshi/cbmyx/wenji/" title="马云秀律师文集"><li>律师文集</li></a>
+        <a href="http://www.chinalawedu.com/falvzixun/" title="法律咨询首页"><li>法律咨询首页</li></a>
+    </ul>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var memberLogin = $("#memberLogin").val();
+	var logintypeLogin = $("#logintypeLogin").val();
+	if(memberLogin != "" ){
+		$("#loginSuccessDiv").show();
+		$("#unloginDiv").hide();
+	}else{
+		$("#loginSuccessDiv").hide();
+		$("#unloginDiv").show();
+	}
+});
+
+
+function checkdataLogin(){
+	var userName = $("#usernameLogin").val(),
+		passwd = $("#passwdLogin").val(),
+		logintype = $("#logintypeLogin").val(),
+		randcodeLog = $("#randcodeLogLogin").val();
+	if(userName == ""){
+		alert("请输入会员代码！");
+		return false;  
+	}else if (passwd == ""){
+		alert("请输入密码！");
+		return false;  
+	}else if (logintype == ""){	
+		alert("请选择会员类别！");
+		return false;  
+	}else if (randcodeLog == ""){	
+		alert("为保证广大学员账号的安全性，请在“验证码输入框”中输入右侧的4位数字！");
+		return false;  
+	}
+	
+	passwd =$.trim(passwd);
+	setCookieLogin();
+	$.getJSON("http://portal.cdeledu.com/auth/index.php?username=" + userName+"&passwd="+ passwd
+             + "&randcode="+ randcodeLog + "&cmd=ucAuth&domain=@chinalawedu.com&randid=login&type=JSON&jsonpCallback=?",
+		function(data) {
+			var errMeg ="";
+			var code = data.code.replace("/[ ]/g","");
+			switch(code){
+			case "0" :{
+				var sid = data.sid;
+				setLoginSucCookieTop(sid);
+				return;
+				}
+			case "-1" :{
+			
+				errMeg="登录失败。";
+				break;
+				}
+			case "-2" :{
+			
+				errMeg="登录失败。";
+				break;
+				}
+			case "-4" :{
+				errMeg="会员代码或密码错误。";
+				break;
+				}
+			case "-5" :{
+				errMeg="用户不存在。";
+				break;
+				}
+			case "-6" :{
+				errMeg="验证码错误。";
+				break;
+				}
+			}
+		 	alert(errMeg);
+	     });
+}
+
+function setCookieLogin(){
+    var options = { path: '/', expires: 7, domain: "chinalawedu.com"};
+    var type = $("#logintypeLogin").val();
+    $.cookie("logintype", type, options);
+}
+function setLoginSucCookieTop(sid){
+	var type = $("#logintypeLogin").val();
+	if(type != null && type != "" && sid != null && sid != ""){
+		$.post("/falvzixun/member/operate.do;jsessionid=08B33440DA8EFA0551BA25944F17086D",
+		{op: "getSSOMember", sid: sid},
+		function(data){
+			var result = eval('('+data+')');     
+            if (result.msg == 'ok'){
+	            $("#usernameLogin").val("");
+				$("#passwdLogin").val("");
+				$("#randcodeLogLogin").val("");
+           		window.location.reload();
+           		return;
+            }else if (result.msg == 'unValidLogin'){
+              		window.parent.location.href="/falvzixun/logout.jsp;jsessionid=08B33440DA8EFA0551BA25944F17086D?gotoURL=errorInfo.jsp";
+              		window.event.returnValue = false;
+           } else {
+              		alert("登录失败。");
+           }
+		});
+	}
+}
+
+
+function chgverifyLogLogin(){
+	var date = new Date();
+	var t = date.getTime();
+	$("#timeLog").val(t);
+	document.getElementById("randcodeLogImgLogin").src = "http://portal.cdeledu.com/auth/randcode.php?id=login&time="+t;
+}
+
+function logout(){	
+	$.post("/falvzixun/member/operate.do;jsessionid=08B33440DA8EFA0551BA25944F17086D",
+		{op: "logoutAjax"},
+		function(data){
+			var result = eval('('+data+')');     
+            if (result.msg == 'ok'){
+         		window.location.reload();
+         		return;
+            }else {
+              	alert("退出失败。");
+           }
+		});
+}
+</script>
+    
+    <div class="maintop">
+    	
+		
+    	
+    	<div class="lshil">
+    	
+<style>
+/* 律所介绍 */
+.lshijs{ width:298px; float:left; border:1px solid #ffbebe; background-color:#fef7f7; padding:6px 0; position:relative;}
+.lshijs .top{ overflow:hidden; width:283px; padding:15px 0 10px 15px;}
+.lshijs .top-left{ width:99px; float:left;}
+.lshijs .top-left img{ width:97px; height:131px; padding:1px; border:1px solid #ffbebe;}
+.lshijs .top-right{ width:150px; float:left; margin-left:15px; line-height:22px;}
+.lshijs .top-right span{ font-size:18px; font-weight:700; font-family:'微软雅黑';}
+.lshijs .top-right b{ color:#b50000;}
+.lshijs .top-right-gz{ line-height:22px; padding-left:24px; background:url(http://www.chinalawedu.com/falvzixun/images/lvshigeren/lvshi_03.gif) no-repeat 5px center;}
+.lshijs .bottom{ width:268px; padding:0 15px; line-height:22px;}
+.lshijs .b{width:52px;height:48px;position:absolute;left: -3px;top: -2px;}
+</style>
+
+<script type="text/javascript" src="http://www.chinalawedu.com/falvzixun/theme/js/jquery.cookie.js"></script>
+<style>
+
+.background {
+	background-color:#666;
+	position: fixed;
+	_position: absolute;
+	z-index:99;
+	left:0;
+	top:0;
+	display:none;
+	width:100%;
+	_width: expression(document .   documentElement .   clientWidth);
+	height: 100%;
+	_height: expression(document .   documentElement .   clientHeight);
+	opacity:0.5;
+	filter: alpha(opacity=50);
+	-moz-opacity: 0.5;
+}
+
+.webox {
+	position: fixed;
+	_position: absolute;
+	z-index: 999;
+	padding: 8px;
+	border: solid 1px #000;
+	_background: #FFF;
+	background: rgba(10, 10, 10, 0.5);
+}
+.webox .dtest{ width:145px; height:20px; border:1px solid #b09081; line-height:20px;}
+.webox .a-test8{ width:47px; height:21px; background:url(/falvzixun/images/index/index_41.jpg) no-repeat; cursor:pointer; color:#EF4601; font-size:12px;}
+.webox .dlfc {
+	background: url('/falvzixun/images/mianfeizixun/bindex_07.jpg') repeat-x scroll 0 0 transparent;
+	height: 26px;
+	width: 302px;
+}
+.webox .center{ width:302px; margin-bottom:15px; font-size:12px;}
+.webox .center-top{ width:302px; height:8px;}
+.webox .center-center{ width:302px; background:url(/falvzixun/images/dlzc/dlzc1_12.jpg) repeat-y; padding:8px 0;}
+.webox .center-center-01{ width:302px; height:22px; margin-bottom:20px;}
+.webox .center-center-01-left{ width:96px; line-height:22px; float:left; text-align:right; color:#ef4601;}
+.webox .center-center-01-right{ width:147px; float:left;}
+.webox .center-center-02{ width:302px; height:22px;}
+.webox .center-center-02-left{ width:96px; line-height:22px; float:left; text-align:right; color:#ef4601;}
+.webox .center-center-02-right{ width:68px; float:left;}
+.webox .center-bottom{ width:302px; height:8px;}
+</style>
+<div class='background' style='display:none;'></div>
+<div id='loginDiv' class='webox'
+	style='width: 300px; height: 280px; border: 1px #0066cc; position: absolute; background: #FFFFFF; display: none;'>
+	<p style="font-size: 12px; color: #EF4601;">您好！如果您已经在我们网站注册过，请直接输入您的会员代码和密码登录。如果未注册过请<a target="_blank" href='#' onclick="goregist();closelogdev();return false;">点击此处进行注册</a>。</p>
+	<div class='dlfc'>
+	   	<div class='zc-top-left'>会员登录</div>
+	</div>
+	<div class='center'>
+          	<div class='center-top'><img src='http://www.chinalawedu.com/falvzixun/images/dlzc/dlzc1_09.jpg' /></div>
+              <div class='center-center'>
+              	<form id='ssubmitForm' method='post' action='http://portal.cdeledu.com/auth/index.php' >
+               	<div class='center-center-01'>
+                   	<div class='center-center-01-left'>会员代码：</div>
+                       <div class='center-center-01-right'><input name='username' id='username' type='text' class='dtest'/></div>
+                   </div>
+                   <div class='center-center-01'>
+                   	<div class='center-center-01-left'>密　　码：</div>
+                       <div class='center-center-01-right'><input name='passwd' id='passwd' type='password' class='dtest'/></div>
+                   </div>
+                   <div class='center-center-01'>
+                   	<div class='center-center-02-left'>会员类别：</div>
+                       <div class='center-center-02-right'>
+                       	<select name='logintype' id='logintype' style='width:110px;'>
+                       		<option value=''>---请选择---</option>
+                       		<option value='public'>公众会员</option>
+                       		<option value='lawyer'>律师会员</option>
+                       		<option value='office'>律所会员</option>
+                       		<option value='org'>法律援助机构</option>
+                       	</select>
+                       </div>
+                   </div>
+                   <div class='center-center-02'>
+                   	<div class='center-center-02-left'>验 证 码：</div>
+                       <div class='center-center-02-right'><input name='randcode' id='randcodeLog' type='text' class='dtest' style='width:62px;'/></div>
+                       <div class='center-center-02-right' style='white-space:nowrap;'>
+                       	<img src='http://portal.cdeledu.com/auth/randcode.php?id=login' id='randcodeLogImg'/>
+                       	<a style='color: #000000;' href='#' onclick='chgverifyLog();'>刷新</a>
+                       </div>
+                   </div>
+				<input type='hidden' id='turl' name='turl' value='http://www.chinalawedu.com/falvzixun/login_succe_forOneToOne.jsp'/>
+				<input type='hidden' id='furl' name='furl' value='http://cbmyx.chinalawedu.com:80/falvzixun/loginAgain.jsp'/>
+				<input type='hidden' id='eurl' name='eurl' value='http://cbmyx.chinalawedu.com:80/falvzixun/loginAgain.jsp' />
+				<input type='hidden' id='type' name='type' value='JS' />
+				<input type='hidden' id='domain' name='domain' value='@chinalawedu.com' />
+				<input type='hidden' id='randid' name='randid' value='login' />
+				<input type='hidden' id='cmd' name='cmd' value='ucAuth' />
+				<input type='hidden' id='timeLog' name='time' id='time' value='' />
+				<input type='hidden' id='parems' />
+           	</form>
+              </div>
+              <div class='center-bottom'><img src='http://www.chinalawedu.com/falvzixun/images/dlzc/dlzc1_18.jpg' /></div>
+          	<div style="margin-top:15px;" align='center'>
+          		<input name='1' type='button' class='a-test8' onclick='checkdata()' id='1' value='登录'/>&nbsp;&nbsp;&nbsp;&nbsp;
+          		<input name='1' type='button' class='a-test8' onclick='closelogdev();return false;' id='1' value='取消'/>&nbsp;&nbsp;&nbsp;&nbsp;
+          		<input name='1' type='button' class='a-test8' onclick='goregist();closelogdev();return false;' id='1' value='注册'/>
+          	</div>
+          </div>
+          	<input type="hidden" id="objID">
+          	<input type="hidden" id="objType">
+</div>
+
+<script type="text/javascript">
+function goregist(){
+	window.open("/falvzixun/registerSecend/");
+}
+
+function openLoginDiv(objID,objType){
+	$("#username").val("");
+	$("#passwd").val("");
+	$("#randcodeLog").val("");
+	$("#logintype").val("");
+	var obju = $("#loginDiv");
+    obju.css("left",($("body").width()-obju.width())/2-20+"px");   
+    obju.css("top",($(window).height()-obju.height())/2+$(window).scrollTop()+"px"); 
+    $(".background").show();
+    $("#objType").val(objType);
+    $("#objID").val(objID);
+    chgverifyLog();
+    obju.css("display","");
+}
+
+function checkdata(){
+	var userName = $("#username").val(),
+		passwd = $("#passwd").val(),
+		logintype = $("#logintype").val(),
+		randcodeLog = $("#randcodeLog").val();
+	if(userName == ""){
+		alert("请输入会员代码！");
+		return false;  
+	}else if (passwd == ""){
+		alert("请输入密码！");
+		return false;  
+	}else if (logintype == ""){	
+		alert("请选择会员类别！");
+		return false;  
+	}else if (randcodeLog == ""){	
+		alert("为保证广大学员账号的安全性，请在“验证码输入框”中输入右侧的4位数字！");
+		return false;  
+	}
+	
+	passwd =$.trim(passwd);
+	var objType = $("#objType").val();
+    var objID = $("#objID").val();
+	var url = window.location.href;
+	if(url.indexOf("?") > -1){
+		url = url.slice(0,url.indexOf("?"));
+	}
+	$("#furl").val(url);
+	$("#eurl").val(url);
+	setCookie(url);
+	
+	$.getJSON("http://portal.cdeledu.com/auth/index.php?username=" + userName+"&passwd="+ passwd
+             + "&randcode="+ randcodeLog + "&cmd=ucAuth&domain=@chinalawedu.com&randid=login&type=JSON&jsonpCallback=?",
+		function(data) {
+			var errMeg ="";
+			var code = data.code.replace("/[ ]/g","");
+			switch(code){
+			case "0" :{
+				var sid = data.sid;
+				setLoginSucCookie(sid);
+				return;
+				}
+			case "-1" :{
+			
+				errMeg="登录失败。";
+				break;
+				}
+			case "-2" :{
+			
+				errMeg="登录失败。";
+				break;
+				}
+			case "-4" :{
+				errMeg="会员代码或密码错误。";
+				break;
+				}
+			case "-5" :{
+				errMeg="用户不存在。";
+				break;
+				}
+			case "-6" :{
+				errMeg="验证码错误。";
+				break;
+				}
+			}
+		 	alert(errMeg);
+	     });
+}
+
+function setCookie(url){
+    var options = { path: '/', expires: 7, domain: "chinalawedu.com"};
+    var type = $("#logintype").val();
+    $.cookie("logintype", type, options);
+    $.cookie("url", url, options);
+}
+function setLoginSucCookie(sid){
+	var type = $("#logintype").val();
+	if(type != null && type != "" && sid != null && sid != ""){
+		$.post("/falvzixun/member/operate.do;jsessionid=181B91BEE15D74BEC07F9FAF033A237B",
+		{op: "getSSOMember", sid: sid},
+		function(data){
+			var result = eval('('+data+')');      
+               if (result.msg == 'ok'){
+               		alert("登录成功。");
+               		closelogdev();
+               		return;
+               }else if (result.msg == 'unValidLogin'){
+               		window.parent.location.href="/falvzixun/logout.jsp;jsessionid=181B91BEE15D74BEC07F9FAF033A237B?gotoURL=errorInfo.jsp";
+               		window.event.returnValue = false;
+               } else {
+               		alert("登录失败。");
+               }
+		});
+	}
+}
+
+
+function chgverifyLog(){
+	var date = new Date();
+	var t = date.getTime();
+	$("#timeLog").val(t);
+	document.getElementById("randcodeLogImg").src = "http://portal.cdeledu.com/auth/randcode.php?id=login&time="+t;
+}
+function closelogdev(){
+	$(".background").hide();
+	$("#loginDiv").hide();
+}
+</script>
+ 
+
+<div class="lshijs">
+    <div class="top">
+   	  <div class="top-left">
+			
+	      		
+	      			
+	      				<img Width ="81" Height= "97" title="马云秀律师个人主页" src="http://img.cdeledu.com/ADVC/2015/0304/1425456888752-0.jpg" />
+	      			
+	      			
+	      		
+	      		
+	      	
+   	  	</div>
+		<div class="top-right">
+        	<span title="马云秀">马云秀<b>律师</b></span><br>
+        	<div class="top-right-gz">	
+	        	
+	        		<a href="#" onclick="addNotice(1729,'lawyer')">加关注</a>	
+	        	
+        	</div>
+            积  分：22956<br>
+            排  名：6<br>
+            关  注：9<br>
+            <a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/zixun/list_1/"><img src="http://www.chinalawedu.com/falvzixun/images/lvshigeren/lvshigr_07_02.jpg" /></a>
+        </div>
+  </div>
+    <div class="bottom" style="height:153px;">
+  		地　　区：广东
+  		&nbsp;深圳<br>
+        <p title="13316985395">电　　话：13316985395</p>
+        <p title="14403200910837871">执业证号：14403200910837871</p>
+        <p title='广东德城律师事务所'>
+        所属律所：
+        广东德城律师事务所
+        <br>
+        </p>
+        <p title='cbmyx@163.com'>
+        电子邮箱：
+        cbmyx@163.com
+        <br>
+        </p>
+        <p title='福田区彩田南路2032号海天大厦2433室'>
+        	地　　址：
+        	福田区彩田南路2032号海天大厦
+        <br>  
+        </p>
+         <p title='http://cbmyx.chinalawedu.com'>
+        	个人主页：<a href="http://cbmyx.chinalawedu.com">cbmyx.chinalawedu.com</a>
+        </p>
+  </div>
+  <div class="b"><img src="http://www.chinalawedu.com/falvzixun/images/lvshigeren/lvgr_27.gif" /></div>
+</div>
+    	
+        </div>
+        
+        
+        <div class="lshijj">
+       	  	<div class="title">
+            	<div class="title-left">律师简介</div>
+                <div class="title-center"></div>
+                <div class="title-right"></div>
+          	</div>
+            <div class="bottom" style="height:301px;">
+           	  	<div class="t" style="height:202px;">
+                	<span></span>
+					
+			      		
+			      			   本科学历，高级职称 ，中华全国律师协会会员,注册律师。
+   深圳市电视台都市频道法观天下嘉宾律师。
+   深圳市律师协会民事法律专业委员会会员（委员会共28人）。第九届深圳市律师代表大会代表。
+    广东德城律师事务所律师，担任地方政府和多家企业的法律顾问，代理民商事和刑事辩护案件。曾作为政府代表团成员多次参与中外方重大投资合作开发项目的谈判以及合同、协议审查；协助政府推行国有企业改制；援助多起农民工讨薪案件；担任多起越境走私、贩毒案件和的辩护人。
+   拥有多年大中型企业管理工作经验，曾在国有企业任科长职务多年。
+   愿意结交四面八方的朋友,愿意为需要法律帮助的朋友提供法律帮助. ......<a href="http://www.chinalawedu.com/lvshi/cbmyx/2.shtm" target="_self"><span>[点击查看更多律师个人简介]</span></a>
+			      		
+			      		
+			      	                	
+                </div>
+  				<div class="c">
+                	<ul>
+                    	<li style="font-size:14px; font-weight:700; color:#cc080e; text-align:center;">擅长领域</li>
+                        
+	                		<li>债务追讨</li>
+	                		
+            			
+	                		<li>医疗纠纷</li>
+	                		
+            			
+	                		<li>交通事故</li>
+	                		
+            			
+	                		<li>合同纠纷</li>
+	                		
+            			
+	                		<li>劳动纠纷</li>
+	                		<li>&nbsp;&nbsp;</li>
+            			
+	                		<li>工伤事故</li>
+	                		
+            			
+	                		<li>人身损害</li>
+	                		
+            			
+	                		<li>婚姻家庭</li>
+	                		
+            			
+	                		<li>商标专利</li>
+	                		
+            			
+	                		<li>刑事辩护</li>
+	                		
+            			
+                    </ul>
+              	</div>
+                <div class="b">
+                
+                </div>
+          </div>
+        </div>
+        
+        
+    </div>
+    <div class="mainbottom">
+    	
+			
+    	<div class="mainbottom-left">
+        	
+            <div class="lshidt">
+                <div class="title">
+                    <div class="title-l">网站公告</div>
+                </div>
+                <div class="bottom">
+                  <div id="xingsheng" style=" overflow:hidden; width:190px; height:147px; line-height:22px; font-size:12px;">
+                    <div id="xingsheng1" style="overflow:hidden;"> 
+						
+                    </div>
+                    <div id="xingsheng2"></div>
+                  </div>
+                  
+                </div>
+            </div>
+              
+            
+            
+            
+             
+            
+<!--  -->
+<div class="lmtj">
+	<div class="title">
+		<div class="title-l">
+			优秀栏目推荐
+		</div>
+	</div>
+	<div class="bottom">
+		<div class="bottom-bottom">
+			<div class="bottom-bottom-left">
+				<a href="http://www.chinalawedu.com/falvzixun/gongkaizixun/" target="_blank">免费公开咨询</a>
+			</div>
+			<div class="bottom-bottom-right">
+				<a href="http://www.chinalawedu.com/web/15700/" target="_blank">法律常识</a>
+			</div>
+		</div>
+		<div class="bottom-bottom">
+			<div class="bottom-bottom-left">
+				<a href="http://www.chinalawedu.com/falvzixun/yiduiyizixun/" target="_blank">一对一咨询</a>&nbsp;&nbsp;
+			</div>
+			<div class="bottom-bottom-right">
+				<a href="http://www.chinalawedu.com/anjianweituo/" target="_blank">案件委托</a>
+			</div>
+		</div>
+		<div class="bottom-bottom">
+			<div class="bottom-bottom-left">
+				<a href="http://www.chinalawedu.com/lvsuo/" target="_blank">律所在线名录</a>
+			</div>
+			<div class="bottom-bottom-right">
+				<a href="http://www.chinalawedu.com/falvyuanzhu/" target="_blank">法律援助机构</a>
+			</div>
+		</div>
+	</div>
+</div> 
+             
+        </div>
+        
+        <div class="mainbottom-right">
+            
+            <div class="cgal" style=" margin:0;">
+            
+				
+                <div class="left">
+                    <div class="left-title">
+                        <div class="left-title-l">个人文集</div>
+                        <div class="left-title-r"><a href="http://www.chinalawedu.com/lvshi/cbmyx/wenji/list_1/" target="_blank">更多>></a></div>
+                    </div>
+                    <div class="left-bottom" style="height:260px;">
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_19177.shtm" target="_blank" title="不受法律保护,也是一种保护">不受法律保护,也是一种保护</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_19026.shtm" target="_blank" title="对于给一点阳光就灿烂的思考">对于给一点阳光就灿烂的思考</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_18818.shtm" target="_blank" title="最高人民法院关于适用《中华人民共和国婚姻法》若干问题的解释（三）">最高人民法院关于适用《中华人民共和国婚姻法》若干问</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_18111.shtm" target="_blank" title="关于尊重">关于尊重</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_17756.shtm" target="_blank" title="阳光与黑暗">阳光与黑暗</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_16831.shtm" target="_blank" title="最高人民法院关于《中华人民共和国刑法修正案（八）》时间效力问题的解释">最高人民法院关于《中华人民共和国刑法修正案（八）》</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_16830.shtm" target="_blank" title="最高人民法院关于死刑缓期执行限制减刑案件审理程序若干问题的规定">最高人民法院关于死刑缓期执行限制减刑案件审理程序若</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_16829.shtm" target="_blank" title="最高人民法院、最高人民检察院关于执行《中华人民共和国刑法》确定罪名的补充规定（五）">最高人民法院、最高人民检察院关于执行《中华人民共和</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_16636.shtm" target="_blank" title="已撤诉的劳动争议案件劳动争议仲裁委员会是否可以再受理">已撤诉的劳动争议案件劳动争议仲裁委员会是否可以再受</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/lvshi/cbmyx/5_16576.shtm" target="_blank" title="最高人民法院、最高人民检察院关于办理诈骗刑事案件具体应用法律若干问题的解释">最高人民法院、最高人民检察院关于办理诈骗刑事案件具</a><br>
+			            
+                    </div>
+                </div>
+                
+                
+				
+                <div class="right">
+                  <div class="right-title">
+                    <div class="right-title-l">回复的公开咨询</div>
+                  </div>
+                      <div class="left-bottom" style="height:260px;">
+			            
+			            	<a href="http://www.chinalawedu.com/hunyinjiating/mf_157288.shtm" target="_blank" title="离婚咨询  处理">离婚咨询  处理</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/hetongjiufen/mf_153244.shtm" target="_blank" title="个人贷款保证金和违约金">个人贷款保证金和违约金</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/fangchankaifa/mf_153224.shtm" target="_blank" title="请问我老婆提出离婚怎么办？">请问我老婆提出离婚怎么办？</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/hunyinjiating/mf_153217.shtm" target="_blank" title="老公要离婚！">老公要离婚！</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/xingshibianhu/mf_153208.shtm" target="_blank" title="私家车交通肇事">私家车交通肇事</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/laodongjiufen/mf_152899.shtm" target="_blank" title="公司没签订劳动合同，没买社保">公司没签订劳动合同，没买社保</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/xiaofeiquanyi/mf_152712.shtm" target="_blank" title="住宾馆失窃谁负责">住宾馆失窃谁负责</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/zhaiwuzhuitao/mf_152602.shtm" target="_blank" title="关于借款追讨事项">关于借款追讨事项</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/xingshizisu/mf_152502.shtm" target="_blank" title="甲是否应该承担法律责任">甲是否应该承担法律责任</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/yiliaojiufen/mf_152496.shtm" target="_blank" title="医院误诊导致病人耽误治疗">医院误诊导致病人耽误治疗</a><br>
+			            
+                  </div>
+                </div>
+                
+            </div>
+            
+        	
+            <div class="cgal">
+            	
+				
+                <div class="left">
+                    <div class="left-title">
+                        <div class="left-title-l">成功案例</div>
+                        <div class="left-title-r"><a href="http://www.chinalawedu.com/lvshi/cbmyx/anli/list_1/" target="_blank">更多>></a></div>
+                    </div>
+                    <div class="left-bottom" style="height:260px;">
+			            
+                    </div>
+                </div>
+                
+                
+				
+                <div class="right">
+                  <div class="right-title">
+                    <div class="right-title-l" style="width: 190px;">针对马云秀的一对一咨询</div>
+                  </div>
+                    <div class="left-bottom" style="height:260px;">
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_91178.shtm" target="_blank" title="辞退怀孕职工问题">辞退怀孕职工问题</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_91081.shtm" target="_blank" title="拆迁房交易问题">拆迁房交易问题</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_90341.shtm" target="_blank" title="高三男孩的过激行为">高三男孩的过激行为</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_88960.shtm" target="_blank" title="有货款收不回">有货款收不回</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_88493.shtm" target="_blank" title="房产证办理证件问题">房产证办理证件问题</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_88231.shtm" target="_blank" title="要回我儿子的血汗钱">要回我儿子的血汗钱</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_88225.shtm" target="_blank" title="我要回孩子的血汗钱">我要回孩子的血汗钱</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_88150.shtm" target="_blank" title="合作及买卖纠纷">合作及买卖纠纷</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_87992.shtm" target="_blank" title="关于婚后财产纠纷的问题">关于婚后财产纠纷的问题</a><br>
+			            
+			            	<a href="http://www.chinalawedu.com/falvzixun/lvshi/cbmyx/1t1_87931.shtm" target="_blank" title="公务员方面的问题，">公务员方面的问题，</a><br>
+			            
+                  </div>
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+	<script language="javascript" src="http://www.chinalawedu.com/falvzixun/js/footer_num.js"></script>         
+  
+
+</body>
+</html>
